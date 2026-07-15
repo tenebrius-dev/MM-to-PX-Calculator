@@ -616,12 +616,12 @@ export default function App() {
       <footer className="bg-surface border-t border-outline-variant md:border-outline-variant/50 flex flex-col md:flex-row md:justify-between items-center w-full px-md md:px-margin py-lg mt-xl md:mt-auto relative z-20">
         <div className="flex justify-between items-center md:hidden w-full">
           <span className="text-[12px] text-on-surface-variant/80">© {new Date().getFullYear()} ММ → PX.</span>
-          <a className="text-[12px] font-medium text-on-surface-variant hover:text-secondary transition-colors" href="#">GitHub</a>
+          <a className="text-[12px] font-medium text-on-surface-variant hover:text-secondary transition-colors" href="https://github.com/tenebrius-dev/MM-to-PX-Calculator" target="_blank" rel="noreferrer">GitHub</a>
         </div>
 
         <span className="hidden md:inline text-body-md font-bold text-primary">© {new Date().getFullYear()} ММ → PX.</span>
         <div className="hidden md:flex gap-md text-body-md text-on-surface-variant">
-          <a className="hover:text-primary transition-colors" href="#">GitHub</a>
+          <a className="hover:text-primary transition-colors" href="https://github.com/tenebrius-dev/MM-to-PX-Calculator" target="_blank" rel="noreferrer">GitHub</a>
         </div>
       </footer>
     </div>
