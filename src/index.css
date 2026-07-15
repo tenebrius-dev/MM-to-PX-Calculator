@@ -1,0 +1,138 @@
+@import "tailwindcss";
+
+@theme {
+  --color-surface-container-low: #f4f3f3;
+  --color-surface-container: #eeeeee;
+  --color-outline-variant: #c4c7c7;
+  --color-on-secondary: #ffffff;
+  --color-on-error-container: #93000a;
+  --color-surface-tint: #5f5e5e;
+  --color-error-container: #ffdad6;
+  --color-on-secondary-container: #efefff;
+  --color-surface-container-highest: #e2e2e2;
+  --color-primary: #000000;
+  --color-on-primary-container: #858383;
+  --color-surface-bright: #f9f9f9;
+  --color-on-tertiary: #ffffff;
+  --color-on-background: #1a1c1c;
+  --color-tertiary-fixed-dim: #c7c6c5;
+  --color-tertiary-fixed: #e3e2e0;
+  --color-surface-dim: #dadada;
+  --color-secondary-fixed: #dde1ff;
+  --color-on-primary-fixed: #1c1b1b;
+  --color-primary-fixed-dim: #c8c6c5;
+  --color-inverse-on-surface: #f1f1f1;
+  --color-surface-variant: #e2e2e2;
+  --color-primary-fixed: #e5e2e1;
+  --color-on-surface-variant: #444748;
+  --color-on-primary-fixed-variant: #474746;
+  --color-on-primary: #ffffff;
+  --color-secondary: #0040e0;
+  --color-on-tertiary-fixed: #1a1c1b;
+  --color-tertiary: #000000;
+  --color-on-secondary-fixed-variant: #0035be;
+  --color-primary-container: #1c1b1b;
+  --color-secondary-fixed-dim: #b8c3ff;
+  --color-on-error: #ffffff;
+  --color-secondary-container: #2e5bff;
+  --color-surface-container-high: #e8e8e8;
+  --color-on-tertiary-fixed-variant: #464746;
+  --color-inverse-primary: #c8c6c5;
+  --color-error: #ba1a1a;
+  --color-outline: #747878;
+  --color-inverse-surface: #2f3131;
+  --color-tertiary-container: #1a1c1b;
+  --color-background: #f9f9f9;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface: #f9f9f9;
+  --color-on-tertiary-container: #838482;
+  --color-on-surface: #1a1c1c;
+  --color-on-secondary-fixed: #001356;
+
+  --spacing-xs: 4px;
+  --spacing-unit: 8px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-gutter: 24px;
+  --spacing-xl: 32px;
+  --spacing-margin: 40px;
+
+  --font-inter: "Inter", sans-serif;
+  --font-jetbrains: "JetBrains Mono", monospace;
+
+  --font-headline-lg: var(--font-inter);
+  --font-display-lg: var(--font-inter);
+  --font-caption: var(--font-inter);
+  --font-headline-md: var(--font-inter);
+  --font-body-md: var(--font-inter);
+  --font-body-lg: var(--font-inter);
+  --font-data-lg: var(--font-jetbrains);
+  --font-label-mono: var(--font-jetbrains);
+
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-caption--font-weight: 500;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 24px;
+
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 28px;
+
+  --text-label-mono: 14px;
+  --text-label-mono--line-height: 20px;
+  --text-label-mono--letter-spacing: 0.02em;
+  --text-label-mono--font-weight: 500;
+
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 32px;
+  --text-headline-md--font-weight: 600;
+
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 40px;
+  --text-headline-lg--letter-spacing: -0.01em;
+  --text-headline-lg--font-weight: 600;
+
+  --text-display-lg: 48px;
+  --text-display-lg--line-height: 56px;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 700;
+
+  --text-data-lg: 20px;
+  --text-data-lg--line-height: 24px;
+  --text-data-lg--font-weight: 600;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-on-surface);
+  }
+}
+
+@layer components {
+  .focus-ring:focus-within {
+    outline: 1px solid #000000;
+    outline-offset: -1px;
+  }
+  .tab-nums {
+    font-variant-numeric: tabular-nums;
+  }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .crop-marks { position: relative; }
+  .crop-marks::before, .crop-marks::after {
+      content: '';
+      position: absolute;
+      background-color: #000;
+  }
+  .crop-tl::before { top: -4px; left: 0; width: 8px; height: 1px; }
+  .crop-tl::after { top: 0; left: -4px; width: 1px; height: 8px; }
+  .crop-br::before { bottom: -4px; right: 0; width: 8px; height: 1px; }
+  .crop-br::after { bottom: 0; right: -4px; width: 1px; height: 8px; }
+}

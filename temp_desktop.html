@@ -1,0 +1,335 @@
+<!DOCTYPE html><html lang="ru"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ММ → PX</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "surface-container-low": "#f4f3f3",
+                "surface-container": "#eeeeee",
+                "outline-variant": "#c4c7c7",
+                "on-secondary": "#ffffff",
+                "on-error-container": "#93000a",
+                "surface-tint": "#5f5e5e",
+                "error-container": "#ffdad6",
+                "on-secondary-container": "#efefff",
+                "surface-container-highest": "#e2e2e2",
+                "primary": "#000000",
+                "on-primary-container": "#858383",
+                "surface-bright": "#f9f9f9",
+                "on-tertiary": "#ffffff",
+                "on-background": "#1a1c1c",
+                "tertiary-fixed-dim": "#c7c6c5",
+                "tertiary-fixed": "#e3e2e0",
+                "surface-dim": "#dadada",
+                "secondary-fixed": "#dde1ff",
+                "on-primary-fixed": "#1c1b1b",
+                "primary-fixed-dim": "#c8c6c5",
+                "inverse-on-surface": "#f1f1f1",
+                "surface-variant": "#e2e2e2",
+                "primary-fixed": "#e5e2e1",
+                "on-surface-variant": "#444748",
+                "on-primary-fixed-variant": "#474746",
+                "on-primary": "#ffffff",
+                "secondary": "#0040e0",
+                "on-tertiary-fixed": "#1a1c1b",
+                "tertiary": "#000000",
+                "on-secondary-fixed-variant": "#0035be",
+                "primary-container": "#1c1b1b",
+                "secondary-fixed-dim": "#b8c3ff",
+                "on-error": "#ffffff",
+                "secondary-container": "#2e5bff",
+                "surface-container-high": "#e8e8e8",
+                "on-tertiary-fixed-variant": "#464746",
+                "inverse-primary": "#c8c6c5",
+                "error": "#ba1a1a",
+                "outline": "#747878",
+                "inverse-surface": "#2f3131",
+                "tertiary-container": "#1a1c1b",
+                "background": "#f9f9f9",
+                "surface-container-lowest": "#ffffff",
+                "surface": "#f9f9f9",
+                "on-tertiary-container": "#838482",
+                "on-surface": "#1a1c1c",
+                "on-secondary-fixed": "#001356"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "xs": "4px",
+                "unit": "8px",
+                "sm": "8px",
+                "lg": "24px",
+                "xl": "32px",
+                "margin": "40px",
+                "md": "16px",
+                "gutter": "24px"
+        },
+        "fontFamily": {
+                "headline-lg": [
+                        "Inter"
+                ],
+                "display-lg": [
+                        "Inter"
+                ],
+                "caption": [
+                        "Inter"
+                ],
+                "headline-md": [
+                        "Inter"
+                ],
+                "body-md": [
+                        "Inter"
+                ],
+                "data-lg": [
+                        "JetBrains Mono"
+                ],
+                "body-lg": [
+                        "Inter"
+                ],
+                "label-mono": [
+                        "JetBrains Mono"
+                ]
+        },
+        "fontSize": {
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "caption": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "fontWeight": "500"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "data-lg": [
+                        "20px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-mono": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "letterSpacing": "0.02em",
+                                "fontWeight": "500"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        body { background-color: #F9F9F9; color: #1a1c1c; }
+        .hairline { border-width: 1px; border-color: #d1d5db; }
+        .focus-ring:focus-within { outline: 1px solid #000000; outline-offset: -1px; }
+        .tab-nums { font-variant-numeric: tabular-nums; }
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-body-md text-body-md antialiased border-x border-outline-variant/30 max-w-[1440px] mx-auto bg-background" style="background-color: #F9F8F6; border-color: #E5E5E5;">
+<!-- TopNavBar -->
+<header class="bg-surface border-b border-outline-variant/50 sticky top-0 z-50 w-full" style="border-bottom-color: #E5E5E5;">
+<div class="flex justify-between items-center w-full px-margin py-md mx-auto">
+<div class="flex items-center gap-md">
+<span class="text-headline-md font-bold text-primary tracking-tighter uppercase">ММ → PX</span>
+<span class="text-outline-variant hidden md:inline">|</span>
+<span class="text-on-surface-variant hidden md:inline font-medium">Калькулятор размера макета</span>
+</div>
+<nav class="flex gap-lg items-center text-body-md">
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="#">Как рассчитывается</a>
+<a class="text-primary font-bold border-b border-primary pb-xs" href="#">Инфо</a>
+</nav>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow w-full mx-auto px-margin py-xl grid grid-cols-1 lg:grid-cols-12 gap-xl max-w-[1440px]">
+<!-- Left Column (Inputs & Results) -->
+<div class="col-span-1 lg:col-span-7 flex flex-col gap-xl">
+<!-- Step 1: Size & Orientation -->
+<section class="flex flex-col gap-lg">
+<div class="flex justify-between items-end border-b border-outline-variant/30 pb-xs">
+<h2 class="text-caption uppercase tracking-widest text-on-surface-variant">1. РАЗМЕР И ОРИЕНТАЦИЯ</h2>
+</div>
+<div class="flex flex-col gap-lg">
+<!-- Presets -->
+<div class="grid grid-cols-4 gap-sm">
+<button class="px-md py-sm bg-surface border border-secondary text-secondary text-label-mono font-bold transition-all text-center">A4</button>
+<button class="px-md py-sm bg-surface border border-outline-variant/50 text-on-surface-variant text-label-mono font-medium hover:border-primary hover:text-primary transition-all text-center">A3</button>
+<button class="px-md py-sm bg-surface border border-outline-variant/50 text-on-surface-variant text-label-mono font-medium hover:border-primary hover:text-primary transition-all text-center">A2</button>
+<button class="px-md py-sm bg-surface border border-outline-variant/50 text-on-surface-variant text-label-mono font-medium hover:border-primary hover:text-primary transition-all text-center">A1</button>
+</div>
+<!-- Orientation -->
+<div class="flex bg-surface-container-low p-xs border border-outline-variant/30 w-full">
+<button class="flex-1 px-md py-sm bg-surface shadow-sm text-secondary text-label-mono font-bold transition-all">Книжная</button>
+<button class="flex-1 px-md py-sm text-on-surface-variant text-label-mono font-medium hover:text-primary transition-all">Альбомная</button>
+</div>
+<!-- Dimensions -->
+<div class="flex flex-col gap-sm relative">
+<!-- Lock Icon -->
+<div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+<div class="bg-background p-1 rounded-full">
+<button class="bg-surface border border-outline-variant/50 rounded-full p-1 text-on-surface-variant hover:text-primary flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[14px]">link</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-lg">
+<div class="flex flex-col relative group pt-2">
+<label class="absolute top-0 left-sm bg-background px-xs text-[10px] font-bold text-outline z-10 uppercase tracking-widest">ШИРИНА</label>
+<div class="relative flex items-center">
+<input class="w-full bg-surface border border-outline-variant/50 focus-ring text-data-lg font-data-lg text-primary pl-sm pr-12 py-md transition-all h-[56px] focus:outline-none placeholder:text-outline-variant text-right tab-nums" type="text" value="210">
+<span class="absolute right-sm text-outline font-label-mono text-label-mono pl-sm pointer-events-none">мм</span>
+</div>
+</div>
+<div class="flex flex-col relative group pt-2">
+<label class="absolute top-0 left-sm bg-background px-xs text-[10px] font-bold text-outline z-10 uppercase tracking-widest">ВЫСОТА</label>
+<div class="relative flex items-center">
+<input class="w-full bg-surface border border-outline-variant/50 focus-ring text-data-lg font-data-lg text-primary pl-sm pr-12 py-md transition-all h-[56px] focus:outline-none placeholder:text-outline-variant text-right tab-nums" type="text" value="297">
+<span class="absolute right-sm text-outline font-label-mono text-label-mono pl-sm pointer-events-none">мм</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Step 2: Bleed & Margins -->
+<section class="flex flex-col gap-lg">
+<div class="flex justify-between items-end border-b border-outline-variant/30 pb-xs">
+<h2 class="text-caption uppercase tracking-widest text-on-surface-variant">2. ВЫЛЕТЫ И ПОЛЯ</h2>
+</div>
+<div class="grid grid-cols-2 gap-lg pt-2">
+<div class="flex flex-col relative group">
+<label class="absolute -top-[9px] left-sm bg-background px-xs text-[10px] font-bold text-outline z-10 uppercase tracking-widest">ВЫЛЕТЫ (BLEED)</label>
+<div class="relative flex items-center">
+<input class="w-full bg-surface border border-outline-variant/50 focus-ring text-data-lg font-data-lg text-primary pl-sm pr-12 py-md transition-all h-[56px] focus:outline-none placeholder:text-outline-variant text-right tab-nums" type="text" value="2">
+<span class="absolute right-sm text-outline font-label-mono text-label-mono pl-sm pointer-events-none">мм</span>
+</div>
+</div>
+<div class="flex flex-col relative group">
+<label class="absolute -top-[9px] left-sm bg-background px-xs text-[10px] font-bold text-outline z-10 uppercase tracking-widest">ПОЛЯ (MARGINS)</label>
+<div class="relative flex items-center">
+<input class="w-full bg-surface border border-outline-variant/50 focus-ring text-data-lg font-data-lg text-primary pl-sm pr-12 py-md transition-all h-[56px] focus:outline-none placeholder:text-outline-variant text-right tab-nums" type="text" value="10">
+<span class="absolute right-sm text-outline font-label-mono text-label-mono pl-sm pointer-events-none">мм</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Step 3: Resolution (DPI) -->
+<section class="flex flex-col gap-lg">
+<div class="flex justify-between items-end border-b border-outline-variant/30 pb-xs">
+<h2 class="text-caption uppercase tracking-widest text-on-surface-variant">3. РАЗРЕШЕНИЕ</h2>
+</div>
+<div class="flex flex-col gap-lg">
+<div class="grid grid-cols-4 gap-sm">
+<button class="px-sm py-sm bg-surface border border-outline-variant/50 text-on-surface-variant text-label-mono font-medium hover:border-primary hover:text-primary transition-all text-center">72</button>
+<button class="px-sm py-sm bg-surface border border-outline-variant/50 text-on-surface-variant text-label-mono font-medium hover:border-primary hover:text-primary transition-all text-center">150</button>
+<button class="px-sm py-sm bg-surface border border-secondary text-secondary text-label-mono font-bold transition-all text-center">300</button>
+<button class="px-sm py-sm bg-surface border border-outline-variant/50 text-on-surface-variant text-label-mono font-medium hover:border-primary hover:text-primary transition-all text-center">600</button>
+</div>
+<div class="flex flex-col relative group pt-2">
+<label class="absolute top-0 left-sm bg-background px-xs text-[10px] font-bold text-outline z-10 uppercase tracking-widest">DPI</label>
+<div class="relative flex items-center">
+<input class="w-full bg-surface border border-outline-variant/50 focus-ring text-data-lg font-data-lg text-primary pl-sm pr-16 py-md transition-all h-[56px] focus:outline-none placeholder:text-outline-variant text-right tab-nums" type="text" value="300">
+<span class="absolute right-sm text-outline font-label-mono text-label-mono pl-sm pointer-events-none">dpi</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Step 4: Results Block (Centered) -->
+<section class="flex flex-col items-center gap-xl mt-lg p-xl bg-surface-container-low border border-outline-variant/20 text-center" style="background-color: #FFFFFF; border-color: #E5E5E5;"><div class="flex flex-col gap-xl w-full"><div class="flex flex-col gap-sm"><h3 class="text-caption font-medium uppercase tracking-widest text-on-surface-variant">С УЧЕТОМ ВЫЛЕТОВ (GROSS)</h3><div class="flex items-baseline gap-sm justify-center"><span class="text-display-lg font-bold text-primary tracking-tighter leading-none tab-nums font-data-lg">2527,6 × 3555,1</span><span class="text-label-mono text-outline">px</span></div></div><div class="h-px bg-outline-variant/30 w-1/2 mx-auto"></div><div class="flex flex-col gap-sm"><h3 class="text-caption font-medium uppercase tracking-widest text-on-surface-variant">ЧИСТЫЙ РАЗМЕР (NET)</h3><div class="flex items-baseline gap-sm justify-center"><span class="text-headline-lg font-bold text-primary/70 tracking-tight leading-none tab-nums font-data-lg">2480,3 × 3507,9</span><span class="text-label-mono text-outline">px</span></div></div></div><button class="w-full max-w-md py-md bg-primary text-on-primary font-bold hover:bg-black/80 transition-colors flex items-center justify-center gap-sm"><span class="material-symbols-outlined text-[18px]">content_copy</span><span class="text-body-md font-bold uppercase">Скопировать размер</span></button></section>
+</div>
+<!-- Right Column (Preview) -->
+<div class="col-span-1 lg:col-span-5 flex flex-col gap-lg z-10 h-fit lg:sticky top-32">
+<section class="flex flex-col items-center justify-center py-xl bg-surface border border-outline-variant/30 min-h-[600px]" style="border-color: #E5E5E5;">
+<div class="relative bg-surface flex flex-col justify-center items-center transition-all duration-300 border border-outline-variant/20 shadow-sm" style="width: 280px; aspect-ratio: 210 / 297;">
+<!-- Bleed Area (Outer) -->
+<div class="absolute border border-error/40 border-dashed pointer-events-none" style="inset: -6px;"></div>
+<!-- Paper Label -->
+<div class="text-headline-lg font-bold text-outline-variant/40 select-none">A4</div>
+<!-- Margin Area (Inner) -->
+<div class="absolute border border-secondary/40 border-dashed pointer-events-none" style="inset: 16px;"></div>
+<!-- Crop Marks -->
+<div class="absolute -top-4 -left-4 w-4 h-4 border-t border-l border-outline-variant"></div>
+<div class="absolute -top-4 -right-4 w-4 h-4 border-t border-r border-outline-variant"></div>
+<div class="absolute -bottom-4 -left-4 w-4 h-4 border-b border-l border-outline-variant"></div>
+<div class="absolute -bottom-4 -right-4 w-4 h-4 border-b border-r border-outline-variant"></div>
+</div>
+<div class="mt-xl flex gap-lg text-label-mono uppercase text-on-surface-variant">
+<div class="flex items-center gap-xs">
+<span class="w-4 h-0 border-t border-dashed border-error/60"></span>
+<span>ВЫЛЕТЫ (GROSS)</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="w-4 h-0 border-t border-dashed border-secondary/60"></span>
+<span>ПОЛЯ (MARGINS)</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface border-t border-outline-variant/50 mt-auto relative z-20 w-full" style="border-top-color: #E5E5E5;">
+<div class="flex justify-between items-center w-full px-margin py-lg mx-auto">
+<span class="text-body-md font-bold text-primary">© 2024 ММ → PX. Точность швейцарского дизайна.</span>
+<div class="flex gap-md text-body-md text-on-surface-variant">
+<a class="hover:text-primary transition-colors" href="#">Справка</a>
+<a class="hover:text-primary transition-colors" href="#">Конфиденциальность</a>
+<a class="hover:text-primary transition-colors" href="#">GitHub</a>
+</div>
+</div>
+</footer>
+</body></html>
