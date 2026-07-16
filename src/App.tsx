@@ -8,27 +8,21 @@ import {
 } from './utils/calculator';
 
 interface FigmaSvgConfig {
-  format?: string | null;
-  isCustom?: boolean;
-  widthMm: number;
-  heightMm: number;
+  innerFrameName: string;
+  outerFrameName: string;
   pageWidth: number;
   pageHeight: number;
   bleedPx: number;
-  bleedLabel: string;
   verticalGuides?: number[];
   horizontalGuides?: number[];
 }
 
 function createFigmaSvg({
-  format = "A4",
-  isCustom = false,
-  widthMm,
-  heightMm,
+  innerFrameName,
+  outerFrameName,
   pageWidth,
   pageHeight,
   bleedPx,
-  bleedLabel,
   verticalGuides = [],
   horizontalGuides = [],
 }: FigmaSvgConfig) {
@@ -38,19 +32,6 @@ function createFigmaSvg({
 
   const outerWidth = trimWidth + bleed * 2;
   const outerHeight = trimHeight + bleed * 2;
-
-  const formatNumber = (value: number) =>
-    Number(value).toLocaleString("ru-RU", {
-      maximumFractionDigits: 2,
-    });
-
-  // Название внутреннего фрейма
-  const innerFrameName = isCustom || !format
-    ? `${formatNumber(widthMm)}×${formatNumber(heightMm)} мм`
-    : format;
-
-  // Название внешнего фрейма
-  const outerFrameName = `${innerFrameName} with bleeds ${bleedLabel}`;
 
   const verticalPaths = verticalGuides
     .map(Number)
@@ -112,6 +93,73 @@ function createFigmaSvg({
 </svg>`.trim();
 }
 
+type Lang = 'RU' | 'ENG';
+
+const dict = {
+  RU: {
+    subtitle: 'КАЛЬКУЛЯТОР ФОРМАТОВ',
+    step1: '1. РАЗМЕР И ОРИЕНТАЦИЯ',
+    size_mm: 'Размер (мм)',
+    portrait: 'Книжная',
+    landscape: 'Альбомная',
+    width: 'ШИРИНА',
+    height: 'ВЫСОТА',
+    mm: 'мм',
+    step2: '2. ВЫЛЕТЫ И ПОЛЯ',
+    bleeds_margins_mm: 'Вылеты и поля (мм)',
+    bleeds: 'ВЫЛЕТЫ',
+    margins: 'ПОЛЯ',
+    step3: '3. РАЗРЕШЕНИЕ',
+    resolution_dpi: 'Разрешение (DPI)',
+    dpi: 'DPI',
+    bleeds_preview: 'ВЫЛЕТЫ (BLEEDBOX)',
+    margins_preview: 'ПОЛЯ (MARGINS)',
+    format_bleedbox: 'ФОРМАТ С УЧЕТОМ ВЫЛЕТОВ (BLEEDBOX)',
+    copy_w: 'Скопировать ширину',
+    copy_h: 'Скопировать высоту',
+    copied: '✓ СКОПИРОВАНО',
+    px: 'px',
+    format_cropbox: 'ОБРЕЗНОЙ ФОРМАТ (CROPBOX)',
+    copy_figma: 'Скопировать фрейм для Figma',
+    figma_hint1: 'Не забудьте спрятать направляющие',
+    figma_hint2: 'вылетов и полей перед экспортом из Figma',
+    info: 'Инфо',
+    clipboard_error: 'Браузер не разрешил доступ к буферу обмена',
+    with_bleeds: 'с вылетами',
+  },
+  ENG: {
+    subtitle: 'FORMAT CALCULATOR',
+    step1: '1. SIZE & ORIENTATION',
+    size_mm: 'Size (mm)',
+    portrait: 'Portrait',
+    landscape: 'Landscape',
+    width: 'WIDTH',
+    height: 'HEIGHT',
+    mm: 'mm',
+    step2: '2. BLEEDS & MARGINS',
+    bleeds_margins_mm: 'Bleeds & margins (mm)',
+    bleeds: 'BLEEDS',
+    margins: 'MARGINS',
+    step3: '3. RESOLUTION',
+    resolution_dpi: 'Resolution (DPI)',
+    dpi: 'DPI',
+    bleeds_preview: 'BLEEDBOX',
+    margins_preview: 'MARGINS',
+    format_bleedbox: 'PAGE SIZE WITH BLEEDS (BLEEDBOX)',
+    copy_w: 'Copy width',
+    copy_h: 'Copy height',
+    copied: '✓ COPIED',
+    px: 'px',
+    format_cropbox: 'CROPPED PAGE SIZE (CROPBOX)',
+    copy_figma: 'Copy frame for Figma',
+    figma_hint1: "Don't forget to hide the bleed and margin",
+    figma_hint2: "guides before exporting from Figma",
+    info: 'Info',
+    clipboard_error: 'Browser denied clipboard access',
+    with_bleeds: 'with bleeds',
+  }
+};
+
 type Preset = 'A5' | 'A4' | 'A3' | 'A2' | 'A1' | null;
 type Orientation = 'portrait' | 'landscape';
 
@@ -135,6 +183,8 @@ export default function App() {
   type CopiedState = 'grossW' | 'grossH' | 'netW' | 'netH' | null;
   const [copiedState, setCopiedState] = useState<CopiedState>(null);
   const [figmaCopied, setFigmaCopied] = useState(false);
+  const [lang, setLang] = useState<Lang>('RU');
+  const t = dict[lang];
 
   useEffect(() => {
     if (!figmaCopied) return;
@@ -250,15 +300,17 @@ export default function App() {
       const verticalGuides = [bPx, bPx + mPx, rawGrossW - (bPx + mPx), rawGrossW - bPx];
       const horizontalGuides = [bPx, bPx + mPx, rawGrossH - (bPx + mPx), rawGrossH - bPx];
 
+      const innerName = !preset
+        ? `${formatOutput(wNum)}×${formatOutput(hNum)} ${t.mm}`
+        : preset;
+      const outerName = `${innerName} ${t.with_bleeds} ${bleed} ${t.mm}`;
+
       const svg = createFigmaSvg({
-        format: preset,
-        isCustom: !preset,
-        widthMm: wNum,
-        heightMm: hNum,
+        innerFrameName: innerName,
+        outerFrameName: outerName,
         pageWidth: rawNetW,
         pageHeight: rawNetH,
         bleedPx: bPx,
-        bleedLabel: `${bleed} мм`,
         verticalGuides,
         horizontalGuides,
       });
@@ -283,7 +335,7 @@ export default function App() {
       setFigmaCopied(true);
     } catch (error) {
       console.error(error);
-      alert("Браузер не разрешил доступ к буферу обмена");
+      alert(t.clipboard_error);
     }
   };
 
@@ -301,14 +353,24 @@ export default function App() {
         {/* Universal Logo */}
         <div className="flex flex-col gap-1">
           <h1 className="text-display-sm font-bold text-primary leading-none tracking-tight">ММ → PX</h1>
-          <p className="text-[10px] text-on-surface-variant uppercase tracking-widest font-medium">КАЛЬКУЛЯТОР ФОРМАТОВ</p>
+          <p className="text-[10px] text-on-surface-variant uppercase tracking-widest font-medium">{t.subtitle}</p>
         </div>
 
         {/* Language Switch */}
         <div className="flex items-center gap-xs md:gap-sm text-[12px] md:text-[14px] font-medium">
-          <button className="text-primary font-bold hover:opacity-80 transition-opacity">RU</button>
+          <button 
+            onClick={() => setLang('RU')}
+            className={`${lang === 'RU' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary'} transition-colors`}
+          >
+            RU
+          </button>
           <span className="text-outline-variant/50">/</span>
-          <button className="text-on-surface-variant hover:text-primary transition-colors">ENG</button>
+          <button 
+            onClick={() => setLang('ENG')}
+            className={`${lang === 'ENG' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary'} transition-colors`}
+          >
+            ENG
+          </button>
         </div>
       </header>
 
@@ -320,10 +382,10 @@ export default function App() {
           {/* Step 1: Size & Orientation */}
           <section className="flex flex-col gap-md md:gap-lg">
             <div className="hidden md:flex justify-between items-end border-b border-outline-variant/30 pb-xs">
-              <h2 className="text-caption uppercase tracking-widest text-on-surface-variant">1. РАЗМЕР И ОРИЕНТАЦИЯ</h2>
+              <h2 className="text-caption uppercase tracking-widest text-on-surface-variant">{t.step1}</h2>
             </div>
             <div className="md:hidden flex items-center gap-sm">
-              <h2 className="text-[10px] font-medium uppercase tracking-widest text-on-surface-variant whitespace-nowrap">Размер (мм)</h2>
+              <h2 className="text-[10px] font-medium uppercase tracking-widest text-on-surface-variant whitespace-nowrap">{t.size_mm}</h2>
               <div className="h-px bg-outline-variant/50 flex-1"></div>
             </div>
 
@@ -358,7 +420,7 @@ export default function App() {
                       : 'text-on-surface-variant font-medium hover:text-primary'
                     }`}
                 >
-                  Книжная
+                  {t.portrait}
                 </button>
                 <button
                   onClick={() => handleOrientationToggle('landscape')}
@@ -368,7 +430,7 @@ export default function App() {
                       : 'text-on-surface-variant font-medium hover:text-primary'
                     }`}
                 >
-                  Альбомная
+                  {t.landscape}
                 </button>
               </div>
 
@@ -386,8 +448,8 @@ export default function App() {
 
               {/* Dimensions Inputs */}
               <div className="grid grid-cols-2 gap-md md:gap-lg mt-xs md:mt-0">
-                <Input label="ШИРИНА" unit="мм" value={width} onChange={handleWidthChange} />
-                <Input label="ВЫСОТА" unit="мм" value={height} onChange={handleHeightChange} />
+                <Input label={t.width} unit={t.mm} value={width} onChange={handleWidthChange} />
+                <Input label={t.height} unit={t.mm} value={height} onChange={handleHeightChange} />
               </div>
             </div>
           </section>
@@ -395,26 +457,26 @@ export default function App() {
           {/* Step 2: Bleed & Margins */}
           <section className="flex flex-col gap-md md:mt-4">
             <div className="hidden md:flex justify-between items-end border-b border-outline-variant/30 pb-xs">
-              <h2 className="text-caption uppercase tracking-widest text-on-surface-variant">2. ВЫЛЕТЫ И ПОЛЯ</h2>
+              <h2 className="text-caption uppercase tracking-widest text-on-surface-variant">{t.step2}</h2>
             </div>
             <div className="md:hidden flex items-center gap-sm">
-              <h2 className="text-[10px] font-medium uppercase tracking-widest text-on-surface-variant whitespace-nowrap">Вылеты и поля (мм)</h2>
+              <h2 className="text-[10px] font-medium uppercase tracking-widest text-on-surface-variant whitespace-nowrap">{t.bleeds_margins_mm}</h2>
               <div className="h-px bg-outline-variant/50 flex-1"></div>
             </div>
 
             <div className="grid grid-cols-2 gap-sm mt-0">
-              <Input label="ВЫЛЕТЫ" unit="мм" value={bleed} onChange={setBleed} />
-              <Input label="ПОЛЯ" unit="мм" value={margin} onChange={setMargin} />
+              <Input label={t.bleeds} unit={t.mm} value={bleed} onChange={setBleed} />
+              <Input label={t.margins} unit={t.mm} value={margin} onChange={setMargin} />
             </div>
           </section>
 
           {/* Step 3: Resolution */}
           <section className="flex flex-col gap-md md:gap-lg md:mt-4">
             <div className="hidden md:flex justify-between items-end border-b border-outline-variant/30 pb-xs">
-              <h2 className="text-caption uppercase tracking-widest text-on-surface-variant">3. РАЗРЕШЕНИЕ</h2>
+              <h2 className="text-caption uppercase tracking-widest text-on-surface-variant">{t.step3}</h2>
             </div>
             <div className="md:hidden flex items-center gap-sm">
-              <h2 className="text-[10px] font-medium uppercase tracking-widest text-on-surface-variant whitespace-nowrap">Разрешение (DPI)</h2>
+              <h2 className="text-[10px] font-medium uppercase tracking-widest text-on-surface-variant whitespace-nowrap">{t.resolution_dpi}</h2>
               <div className="h-px bg-outline-variant/50 flex-1"></div>
             </div>
 
@@ -438,7 +500,7 @@ export default function App() {
                 })}
               </div>
               <div className="mt-0">
-                <Input label="DPI" unit="dpi" value={dpi} onChange={setDpi} />
+                <Input label={t.dpi} unit={t.dpi.toLowerCase()} value={dpi} onChange={setDpi} />
               </div>
             </div>
           </section>
@@ -464,13 +526,13 @@ export default function App() {
                 <div className="absolute border border-secondary/30 border-dashed pointer-events-none" style={{ inset: `${marginY}% ${marginX}%` }}></div>
                 
                 <div className="md:hidden text-center flex flex-col gap-0 z-10 pointer-events-none select-none text-outline/60">
-                  <span className="text-[10px] font-bold">{preset || `${width} × ${height} мм`}</span>
-                  <span className="text-[8px] uppercase tracking-tighter">{orientation === 'portrait' ? 'Книжная' : 'Альбомная'}</span>
+                  <span className="text-[10px] font-bold">{preset || `${width} × ${height} ${t.mm}`}</span>
+                  <span className="text-[8px] uppercase tracking-tighter">{orientation === 'portrait' ? t.portrait : t.landscape}</span>
                 </div>
                 
                 <div className="hidden md:block text-headline-lg font-bold text-outline-variant/40 select-none text-center">
                   {preset || (
-                    <span className="text-headline-md">{width} × {height} <span className="text-body-md uppercase">мм</span></span>
+                    <span className="text-headline-md">{width} × {height} <span className="text-body-md uppercase">{t.mm}</span></span>
                   )}
                 </div>
 
@@ -481,11 +543,11 @@ export default function App() {
           <div className="mt-auto pt-md flex gap-lg text-[11px] md:text-label-mono uppercase text-on-surface-variant font-bold md:font-medium tracking-[0.1em] md:tracking-normal shrink-0">
               <div className="flex items-center gap-xs">
                 <span className="w-4 h-0 border-t border-dashed border-error/60"></span>
-                <span>ВЫЛЕТЫ (BLEEDBOX)</span>
+                <span>{t.bleeds_preview}</span>
               </div>
               <div className="flex items-center gap-xs">
                 <span className="w-4 h-0 border-t border-dashed border-secondary/60"></span>
-                <span>ПОЛЯ (MARGINS)</span>
+                <span>{t.margins_preview}</span>
               </div>
             </div>
           </section>
@@ -497,20 +559,20 @@ export default function App() {
             <div className="flex flex-col gap-md md:gap-xl w-full items-center">
               {/* GROSS */}
               <div className="flex flex-col gap-xs md:gap-sm items-center w-full">
-                <h3 className="text-[10px] md:text-caption font-medium uppercase tracking-widest text-on-surface-variant">ФОРМАТ С УЧЕТОМ ВЫЛЕТОВ (BLEEDBOX)</h3>
+                <h3 className="text-[10px] md:text-caption font-medium uppercase tracking-widest text-on-surface-variant">{t.format_bleedbox}</h3>
                 <div className="flex items-center justify-center flex-wrap gap-2 md:gap-3">
                   
                   {/* Gross Width */}
                   <button
                     onClick={() => copySingle(grossW, 'grossW')}
                     className="relative group px-3 py-1 bg-surface-variant/20 hover:bg-surface-variant/40 rounded-lg transition-colors cursor-pointer"
-                    title="Скопировать ширину"
+                    title={t.copy_w}
                   >
                     <span className="text-[28px] md:text-display-lg font-bold text-primary group-hover:text-secondary font-data-lg tracking-tighter md:leading-none md:tab-nums transition-colors">
                       {formatOutput(grossW)}
                     </span>
                     <span className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-surface text-secondary text-[10px] px-2 py-1 shadow-md border border-outline-variant/30 rounded font-bold whitespace-nowrap transition-all duration-300 pointer-events-none z-50 ${copiedState === 'grossW' ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
-                      ✓ СКОПИРОВАНО
+                      {t.copied}
                     </span>
                   </button>
 
@@ -522,17 +584,17 @@ export default function App() {
                   <button
                     onClick={() => copySingle(grossH, 'grossH')}
                     className="relative group px-3 py-1 bg-surface-variant/20 hover:bg-surface-variant/40 rounded-lg transition-colors cursor-pointer"
-                    title="Скопировать высоту"
+                    title={t.copy_h}
                   >
                     <span className="text-[28px] md:text-display-lg font-bold text-primary group-hover:text-secondary font-data-lg tracking-tighter md:leading-none md:tab-nums transition-colors">
                       {formatOutput(grossH)}
                     </span>
                     <span className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-surface text-secondary text-[10px] px-2 py-1 shadow-md border border-outline-variant/30 rounded font-bold whitespace-nowrap transition-all duration-300 pointer-events-none z-50 ${copiedState === 'grossH' ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
-                      ✓ СКОПИРОВАНО
+                      {t.copied}
                     </span>
                   </button>
 
-                  <span className="text-[14px] md:text-label-mono font-medium text-outline font-bold ml-1">px</span>
+                  <span className="text-[14px] md:text-label-mono font-medium text-outline font-bold ml-1">{t.px}</span>
                 </div>
               </div>
               
@@ -540,20 +602,20 @@ export default function App() {
               
               {/* NET */}
               <div className="flex flex-col gap-xs md:gap-sm items-center w-full">
-                <h3 className="text-[10px] md:text-caption font-medium uppercase tracking-widest text-on-surface-variant">ОБРЕЗНОЙ ФОРМАТ (CROPBOX)</h3>
+                <h3 className="text-[10px] md:text-caption font-medium uppercase tracking-widest text-on-surface-variant">{t.format_cropbox}</h3>
                 <div className="flex items-center justify-center flex-wrap gap-2 md:gap-3">
                   
                   {/* Net Width */}
                   <button
                     onClick={() => copySingle(netW, 'netW')}
                     className="relative group px-3 py-1 bg-surface-variant/20 hover:bg-surface-variant/40 rounded-lg transition-colors cursor-pointer"
-                    title="Скопировать ширину"
+                    title={t.copy_w}
                   >
                     <span className="text-[20px] md:text-headline-lg font-bold text-primary/80 group-hover:text-secondary font-data-lg tracking-tight md:leading-none md:tab-nums transition-colors">
                       {formatOutput(netW)}
                     </span>
                     <span className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-surface text-secondary text-[10px] px-2 py-1 shadow-md border border-outline-variant/30 rounded font-bold whitespace-nowrap transition-all duration-300 pointer-events-none z-50 ${copiedState === 'netW' ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
-                      ✓ СКОПИРОВАНО
+                      {t.copied}
                     </span>
                   </button>
 
@@ -565,17 +627,17 @@ export default function App() {
                   <button
                     onClick={() => copySingle(netH, 'netH')}
                     className="relative group px-3 py-1 bg-surface-variant/20 hover:bg-surface-variant/40 rounded-lg transition-colors cursor-pointer"
-                    title="Скопировать высоту"
+                    title={t.copy_h}
                   >
                     <span className="text-[20px] md:text-headline-lg font-bold text-primary/80 group-hover:text-secondary font-data-lg tracking-tight md:leading-none md:tab-nums transition-colors">
                       {formatOutput(netH)}
                     </span>
                     <span className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-surface text-secondary text-[10px] px-2 py-1 shadow-md border border-outline-variant/30 rounded font-bold whitespace-nowrap transition-all duration-300 pointer-events-none z-50 ${copiedState === 'netH' ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
-                      ✓ СКОПИРОВАНО
+                      {t.copied}
                     </span>
                   </button>
 
-                  <span className="text-[14px] md:text-label-mono font-medium text-outline font-bold ml-1">px</span>
+                  <span className="text-[14px] md:text-label-mono font-medium text-outline font-bold ml-1">{t.px}</span>
                 </div>
               </div>
               
@@ -586,16 +648,16 @@ export default function App() {
                   className="relative group flex items-center justify-center gap-2 bg-[#1A1A1A] hover:bg-black text-white font-medium px-3 py-2 md:py-3 rounded-lg transition-colors w-full"
                 >
                   <span className="material-symbols-outlined text-[18px]">content_copy</span>
-                  <span>Скопировать фрейм для Figma</span>
+                  <span>{t.copy_figma}</span>
                 </button>
 
                 <div className={`absolute top-[calc(100%+8px)] left-1/2 -translate-x-1/2 bg-surface text-secondary border border-outline-variant/30 px-3 py-2 md:px-4 md:py-3 shadow-xl rounded-lg text-center w-full z-50 transition-all duration-300 pointer-events-none ${figmaCopied ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
                   <div className="font-bold text-[10px] mb-1.5 uppercase tracking-wide">
-                    ✓ СКОПИРОВАНО
+                    {t.copied}
                   </div>
                   <div className="text-[13px] md:text-[14px] font-medium text-on-surface opacity-90 leading-snug">
-                    Не забудьте спрятать направляющие <br/>
-                    вылетов и полей перед экспортом из Figma
+                    {t.figma_hint1} <br/>
+                    {t.figma_hint2}
                   </div>
                 </div>
               </div>
@@ -613,7 +675,7 @@ export default function App() {
         </div>
         
         <div>
-          <button className="text-[12px] md:text-body-md text-on-surface-variant hover:text-secondary transition-colors font-normal">Инфо</button>
+          <button className="text-[12px] md:text-body-md text-on-surface-variant hover:text-secondary transition-colors font-normal">{t.info}</button>
         </div>
       </footer>
     </div>
