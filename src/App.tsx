@@ -98,18 +98,18 @@ type Lang = 'RU' | 'ENG';
 const dict = {
   RU: {
     subtitle: 'КАЛЬКУЛЯТОР ФОРМАТОВ',
-    step1: '1. РАЗМЕР И ОРИЕНТАЦИЯ',
+    step1: 'РАЗМЕР И ОРИЕНТАЦИЯ',
     size_mm: 'Размер (мм)',
     portrait: 'Книжная',
     landscape: 'Альбомная',
     width: 'ШИРИНА',
     height: 'ВЫСОТА',
     mm: 'мм',
-    step2: '2. ВЫЛЕТЫ И ПОЛЯ',
+    step2: 'ВЫЛЕТЫ И ПОЛЯ',
     bleeds_margins_mm: 'Вылеты и поля (мм)',
     bleeds: 'ВЫЛЕТЫ',
     margins: 'ПОЛЯ',
-    step3: '3. РАЗРЕШЕНИЕ',
+    step3: 'РАЗРЕШЕНИЕ',
     resolution_dpi: 'Разрешение (DPI)',
     dpi: 'DPI',
     bleeds_preview: 'ВЫЛЕТЫ (BLEEDBOX)',
@@ -121,6 +121,7 @@ const dict = {
     px: 'px',
     format_cropbox: 'ОБРЕЗНОЙ ФОРМАТ (CROPBOX)',
     copy_figma: 'Скопировать фрейм для Figma',
+    copy_figma_net: 'Скопировать фрейм для Figma без вылетов',
     figma_hint1: 'Не забудьте спрятать направляющие',
     figma_hint2: 'вылетов и полей перед экспортом из Figma',
     info: 'Инфо',
@@ -129,18 +130,18 @@ const dict = {
   },
   ENG: {
     subtitle: 'FORMAT CALCULATOR',
-    step1: '1. SIZE & ORIENTATION',
+    step1: 'SIZE & ORIENTATION',
     size_mm: 'Size (mm)',
     portrait: 'Portrait',
     landscape: 'Landscape',
     width: 'WIDTH',
     height: 'HEIGHT',
     mm: 'mm',
-    step2: '2. BLEEDS & MARGINS',
+    step2: 'BLEEDS & MARGINS',
     bleeds_margins_mm: 'Bleeds & margins (mm)',
     bleeds: 'BLEEDS',
     margins: 'MARGINS',
-    step3: '3. RESOLUTION',
+    step3: 'RESOLUTION',
     resolution_dpi: 'Resolution (DPI)',
     dpi: 'DPI',
     bleeds_preview: 'BLEEDBOX',
@@ -152,6 +153,7 @@ const dict = {
     px: 'px',
     format_cropbox: 'CROPPED PAGE SIZE (CROPBOX)',
     copy_figma: 'Copy frame for Figma',
+    copy_figma_net: 'Copy frame for Figma without bleeds',
     figma_hint1: "Don't forget to hide the bleed and margin",
     figma_hint2: "guides before exporting from Figma",
     info: 'Info',
@@ -183,12 +185,16 @@ export default function App() {
   type CopiedState = 'grossW' | 'grossH' | 'netW' | 'netH' | null;
   const [copiedState, setCopiedState] = useState<CopiedState>(null);
   const [figmaCopied, setFigmaCopied] = useState(false);
+  const [figmaCopiedNet, setFigmaCopiedNet] = useState(false);
   const [lang, setLang] = useState<Lang>('RU');
   const t = dict[lang];
 
   useEffect(() => {
-    if (!figmaCopied) return;
-    const handleDocumentClick = () => setFigmaCopied(false);
+    if (!figmaCopied && !figmaCopiedNet) return;
+    const handleDocumentClick = () => {
+      setFigmaCopied(false);
+      setFigmaCopiedNet(false);
+    };
     // Use timeout to prevent immediate closure on the initial click
     const timer = setTimeout(() => {
       document.addEventListener('click', handleDocumentClick);
@@ -197,7 +203,7 @@ export default function App() {
       clearTimeout(timer);
       document.removeEventListener('click', handleDocumentClick);
     };
-  }, [figmaCopied]);
+  }, [figmaCopied, figmaCopiedNet]);
 
   // Derived parsed values
   const wNum = parseInput(width) || 0;
@@ -287,26 +293,31 @@ export default function App() {
     });
   };
 
-  const handleCopyFigma = async () => {
+  const handleCopyFigma = async (isNet = false) => {
     try {
-      const bPx = bNum * dpiNum / 25.4;
+      const bPx = isNet ? 0 : bNum * dpiNum / 25.4;
       const mPx = mNum * dpiNum / 25.4;
-      const rawGrossW = (wNum + bNum * 2) * dpiNum / 25.4;
-      const rawGrossH = (hNum + bNum * 2) * dpiNum / 25.4;
+      const rawGrossW = (wNum + (isNet ? 0 : bNum * 2)) * dpiNum / 25.4;
+      const rawGrossH = (hNum + (isNet ? 0 : bNum * 2)) * dpiNum / 25.4;
 
       const rawNetW = wNum * dpiNum / 25.4;
       const rawNetH = hNum * dpiNum / 25.4;
 
-      const verticalGuides = [bPx, bPx + mPx, rawGrossW - (bPx + mPx), rawGrossW - bPx];
-      const horizontalGuides = [bPx, bPx + mPx, rawGrossH - (bPx + mPx), rawGrossH - bPx];
+      let verticalGuides = [bPx, bPx + mPx, rawGrossW - (bPx + mPx), rawGrossW - bPx];
+      let horizontalGuides = [bPx, bPx + mPx, rawGrossH - (bPx + mPx), rawGrossH - bPx];
+
+      if (isNet) {
+        verticalGuides = [mPx, rawGrossW - mPx];
+        horizontalGuides = [mPx, rawGrossH - mPx];
+      }
 
       const innerName = !preset
         ? `${formatOutput(wNum)}×${formatOutput(hNum)} ${t.mm}`
         : preset;
-      const outerName = `${innerName} ${t.with_bleeds} ${bleed} ${t.mm}`;
+      const outerName = isNet ? innerName : `${innerName} ${t.with_bleeds} ${bleed} ${t.mm}`;
 
       const svg = createFigmaSvg({
-        innerFrameName: innerName,
+        innerFrameName: isNet ? `${innerName} (Safe Area)` : innerName,
         outerFrameName: outerName,
         pageWidth: rawNetW,
         pageHeight: rawNetH,
@@ -332,7 +343,11 @@ export default function App() {
         new window.ClipboardItem(clipboardData),
       ]);
 
-      setFigmaCopied(true);
+      if (isNet) {
+        setFigmaCopiedNet(true);
+      } else {
+        setFigmaCopied(true);
+      }
     } catch (error) {
       console.error(error);
       alert(t.clipboard_error);
@@ -347,7 +362,7 @@ export default function App() {
   const marginX = (mNum / safeW) * 100;
 
   return (
-    <div className="min-h-screen text-on-surface flex flex-col font-body-md md:text-body-md antialiased border-x border-outline-variant/30 max-w-[390px] md:max-w-[1440px] mx-auto bg-background">
+    <div className="min-h-screen text-on-surface flex flex-col font-body-md md:text-body-md antialiased border-x border-outline-variant/30 w-full max-w-[1440px] mx-auto bg-background">
       {/* TopNavBar */}
       <header className="bg-surface top-0 border-b border-outline-variant/30 md:border-outline-variant/50 sticky z-50 flex justify-between items-center w-full px-md py-md md:px-margin md:py-md max-w-[1440px] mx-auto">
         {/* Universal Logo */}
@@ -380,13 +395,9 @@ export default function App() {
         <div className="col-span-1 lg:col-span-7 flex flex-col gap-xl">
           
           {/* Step 1: Size & Orientation */}
-          <section className="flex flex-col gap-md md:gap-lg">
-            <div className="hidden md:flex justify-between items-end border-b border-outline-variant/30 pb-xs">
-              <h2 className="text-caption uppercase tracking-widest text-on-surface-variant">{t.step1}</h2>
-            </div>
-            <div className="md:hidden flex items-center gap-sm">
-              <h2 className="text-[10px] font-medium uppercase tracking-widest text-on-surface-variant whitespace-nowrap">{t.size_mm}</h2>
-              <div className="h-px bg-outline-variant/50 flex-1"></div>
+          <section className="flex flex-col gap-[20px] md:gap-lg">
+            <div className="flex justify-between items-end border-b border-outline-variant/30 pb-xs">
+              <h2 className="text-[10px] md:text-caption font-medium uppercase tracking-widest text-on-surface-variant">{t.step1}</h2>
             </div>
 
             <div className="flex flex-col gap-md md:gap-lg mt-0 md:mt-0">
@@ -411,10 +422,10 @@ export default function App() {
               </div>
 
               {/* Orientation */}
-              <div className="flex bg-surface-container-low p-[2px] md:p-xs rounded border border-outline-variant/50 md:border-outline-variant/30 w-full mt-xs md:mt-0">
+              <div className="flex items-center bg-surface-container-low p-[4px] md:p-xs h-[46px] md:h-auto rounded border border-outline-variant/50 md:border-outline-variant/30 w-full mt-xs md:mt-0">
                 <button
                   onClick={() => handleOrientationToggle('portrait')}
-                  className={`flex-1 px-md py-sm text-[14px] md:text-label-mono transition-all rounded-[2px]
+                  className={`flex-1 px-md h-[36px] md:h-auto flex items-center justify-center md:py-sm text-[14px] md:text-label-mono transition-all rounded-[2px]
                     ${orientation === 'portrait' 
                       ? 'bg-surface shadow-sm text-secondary font-bold' 
                       : 'text-on-surface-variant font-medium hover:text-primary'
@@ -424,7 +435,7 @@ export default function App() {
                 </button>
                 <button
                   onClick={() => handleOrientationToggle('landscape')}
-                  className={`flex-1 px-md py-sm text-[14px] md:text-label-mono transition-all rounded-[2px]
+                  className={`flex-1 px-md h-[36px] md:h-auto flex items-center justify-center md:py-sm text-[14px] md:text-label-mono transition-all rounded-[2px]
                     ${orientation === 'landscape' 
                       ? 'bg-surface shadow-sm text-secondary font-bold' 
                       : 'text-on-surface-variant font-medium hover:text-primary'
@@ -455,13 +466,9 @@ export default function App() {
           </section>
 
           {/* Step 2: Bleed & Margins */}
-          <section className="flex flex-col gap-md md:mt-4">
-            <div className="hidden md:flex justify-between items-end border-b border-outline-variant/30 pb-xs">
-              <h2 className="text-caption uppercase tracking-widest text-on-surface-variant">{t.step2}</h2>
-            </div>
-            <div className="md:hidden flex items-center gap-sm">
-              <h2 className="text-[10px] font-medium uppercase tracking-widest text-on-surface-variant whitespace-nowrap">{t.bleeds_margins_mm}</h2>
-              <div className="h-px bg-outline-variant/50 flex-1"></div>
+          <section className="flex flex-col gap-[20px] md:mt-4">
+            <div className="flex justify-between items-end border-b border-outline-variant/30 pb-xs">
+              <h2 className="text-[10px] md:text-caption font-medium uppercase tracking-widest text-on-surface-variant">{t.step2}</h2>
             </div>
 
             <div className="grid grid-cols-2 gap-sm mt-0">
@@ -472,12 +479,8 @@ export default function App() {
 
           {/* Step 3: Resolution */}
           <section className="flex flex-col gap-md md:gap-lg md:mt-4">
-            <div className="hidden md:flex justify-between items-end border-b border-outline-variant/30 pb-xs">
-              <h2 className="text-caption uppercase tracking-widest text-on-surface-variant">{t.step3}</h2>
-            </div>
-            <div className="md:hidden flex items-center gap-sm">
-              <h2 className="text-[10px] font-medium uppercase tracking-widest text-on-surface-variant whitespace-nowrap">{t.resolution_dpi}</h2>
-              <div className="h-px bg-outline-variant/50 flex-1"></div>
+            <div className="flex justify-between items-end border-b border-outline-variant/30 pb-xs">
+              <h2 className="text-[10px] md:text-caption font-medium uppercase tracking-widest text-on-surface-variant">{t.step3}</h2>
             </div>
 
             <div className="flex flex-col gap-md mt-xs md:mt-0">
@@ -554,56 +557,14 @@ export default function App() {
         </div>
 
         {/* Step 4: Results Block */}
-        <section className="lg:col-span-12 flex flex-col gap-md md:gap-xl p-md md:px-xl md:pt-xl md:pb-0 bg-surface-container-lowest border border-outline-variant/30 md:border-outline-variant/20 items-center md:text-center rounded mt-0 w-full justify-center">
+        <section className="lg:col-span-12 flex flex-col px-md py-[32px] md:px-xl md:pt-xl md:pb-0 bg-surface-container-lowest border border-outline-variant/30 md:border-outline-variant/20 items-center md:text-center rounded mt-0 w-full justify-center">
           <div className="relative text-center w-full">
-            <div className="flex flex-col gap-md md:gap-xl w-full items-center">
-              {/* GROSS */}
-              <div className="flex flex-col gap-xs md:gap-sm items-center w-full">
-                <h3 className="text-[10px] md:text-caption font-medium uppercase tracking-widest text-on-surface-variant">{t.format_bleedbox}</h3>
-                <div className="flex items-center justify-center flex-wrap gap-2 md:gap-3">
-                  
-                  {/* Gross Width */}
-                  <button
-                    onClick={() => copySingle(grossW, 'grossW')}
-                    className="relative group px-3 py-1 bg-surface-variant/20 hover:bg-surface-variant/40 rounded-lg transition-colors cursor-pointer"
-                    title={t.copy_w}
-                  >
-                    <span className="text-[28px] md:text-display-lg font-bold text-primary group-hover:text-secondary font-data-lg tracking-tighter md:leading-none md:tab-nums transition-colors">
-                      {formatOutput(grossW)}
-                    </span>
-                    <span className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-surface text-secondary text-[10px] px-2 py-1 shadow-md border border-outline-variant/30 rounded font-bold whitespace-nowrap transition-all duration-300 pointer-events-none z-50 ${copiedState === 'grossW' ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
-                      {t.copied}
-                    </span>
-                  </button>
-
-                  <span className="text-[28px] md:text-display-lg font-bold text-outline-variant/50 font-data-lg tracking-tighter md:leading-none md:tab-nums">
-                    ×
-                  </span>
-
-                  {/* Gross Height */}
-                  <button
-                    onClick={() => copySingle(grossH, 'grossH')}
-                    className="relative group px-3 py-1 bg-surface-variant/20 hover:bg-surface-variant/40 rounded-lg transition-colors cursor-pointer"
-                    title={t.copy_h}
-                  >
-                    <span className="text-[28px] md:text-display-lg font-bold text-primary group-hover:text-secondary font-data-lg tracking-tighter md:leading-none md:tab-nums transition-colors">
-                      {formatOutput(grossH)}
-                    </span>
-                    <span className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-surface text-secondary text-[10px] px-2 py-1 shadow-md border border-outline-variant/30 rounded font-bold whitespace-nowrap transition-all duration-300 pointer-events-none z-50 ${copiedState === 'grossH' ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
-                      {t.copied}
-                    </span>
-                  </button>
-
-                  <span className="text-[14px] md:text-label-mono font-medium text-outline font-bold ml-1">{t.px}</span>
-                </div>
-              </div>
-              
-              <div className="h-px bg-outline-variant/30 w-1/2 mx-auto"></div>
-              
-              {/* NET */}
-              <div className="flex flex-col gap-xs md:gap-sm items-center w-full">
-                <h3 className="text-[10px] md:text-caption font-medium uppercase tracking-widest text-on-surface-variant">{t.format_cropbox}</h3>
-                <div className="flex items-center justify-center flex-wrap gap-2 md:gap-3">
+            <div className="flex flex-col w-full items-center">
+              {/* NET (MOVED FIRST) */}
+              <div className="flex flex-col items-center w-full">
+                <div className="flex flex-col gap-xs md:gap-sm items-center w-full">
+                  <h3 className="text-[10px] md:text-caption font-medium uppercase tracking-widest text-on-surface-variant">{t.format_cropbox}</h3>
+                  <div className="flex items-center justify-center flex-wrap gap-2 md:gap-3">
                   
                   {/* Net Width */}
                   <button
@@ -611,7 +572,7 @@ export default function App() {
                     className="relative group px-3 py-1 bg-surface-variant/20 hover:bg-surface-variant/40 rounded-lg transition-colors cursor-pointer"
                     title={t.copy_w}
                   >
-                    <span className="text-[20px] md:text-headline-lg font-bold text-primary/80 group-hover:text-secondary font-data-lg tracking-tight md:leading-none md:tab-nums transition-colors">
+                    <span className="text-[20px] md:text-headline-lg font-bold text-primary/80 group-hover:text-secondary font-data-lg tracking-tight md:leading-none tabular-nums transition-colors">
                       {formatOutput(netW)}
                     </span>
                     <span className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-surface text-secondary text-[10px] px-2 py-1 shadow-md border border-outline-variant/30 rounded font-bold whitespace-nowrap transition-all duration-300 pointer-events-none z-50 ${copiedState === 'netW' ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
@@ -619,7 +580,7 @@ export default function App() {
                     </span>
                   </button>
 
-                  <span className="text-[20px] md:text-headline-lg font-bold text-outline-variant/40 font-data-lg tracking-tight md:leading-none md:tab-nums">
+                  <span className="text-[20px] md:text-headline-lg font-bold text-outline-variant/40 font-data-lg tracking-tight md:leading-none tabular-nums">
                     ×
                   </span>
 
@@ -629,7 +590,7 @@ export default function App() {
                     className="relative group px-3 py-1 bg-surface-variant/20 hover:bg-surface-variant/40 rounded-lg transition-colors cursor-pointer"
                     title={t.copy_h}
                   >
-                    <span className="text-[20px] md:text-headline-lg font-bold text-primary/80 group-hover:text-secondary font-data-lg tracking-tight md:leading-none md:tab-nums transition-colors">
+                    <span className="text-[20px] md:text-headline-lg font-bold text-primary/80 group-hover:text-secondary font-data-lg tracking-tight md:leading-none tabular-nums transition-colors">
                       {formatOutput(netH)}
                     </span>
                     <span className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-surface text-secondary text-[10px] px-2 py-1 shadow-md border border-outline-variant/30 rounded font-bold whitespace-nowrap transition-all duration-300 pointer-events-none z-50 ${copiedState === 'netH' ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
@@ -639,25 +600,86 @@ export default function App() {
 
                   <span className="text-[14px] md:text-label-mono font-medium text-outline font-bold ml-1">{t.px}</span>
                 </div>
-              </div>
-              
-              {/* Figma Button */}
-              <div className="w-full md:w-[340px] flex justify-center md:flex-col md:items-center mb-0 md:mb-xl mt-2 relative">
-                <button
-                  onClick={handleCopyFigma}
-                  className="relative group flex items-center justify-center gap-2 bg-[#1A1A1A] hover:bg-black text-white font-medium px-3 py-2 md:py-3 rounded-lg transition-colors w-full"
-                >
-                  <span className="material-symbols-outlined text-[18px]">content_copy</span>
-                  <span>{t.copy_figma}</span>
-                </button>
+                </div>
 
-                <div className={`absolute top-[calc(100%+8px)] left-1/2 -translate-x-1/2 bg-surface text-secondary border border-outline-variant/30 px-3 py-2 md:px-4 md:py-3 shadow-xl rounded-lg text-center w-full z-50 transition-all duration-300 pointer-events-none ${figmaCopied ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
-                  <div className="font-bold text-[10px] mb-1.5 uppercase tracking-wide">
-                    {t.copied}
-                  </div>
-                  <div className="text-[13px] md:text-[14px] font-medium text-on-surface opacity-90 leading-snug">
-                    {t.figma_hint1} <br/>
-                    {t.figma_hint2}
+                {/* Net Figma Button */}
+                <div className="w-full md:w-auto flex justify-center mt-2 md:mt-[12px] relative">
+                  <button
+                    onClick={() => handleCopyFigma(true)}
+                    className="relative group flex items-center justify-center text-[13px] md:text-[14px] text-on-surface-variant/80 font-medium hover:text-on-surface transition-colors underline decoration-on-surface-variant/30 hover:decoration-on-surface/50 underline-offset-4"
+                  >
+                    <span>{t.copy_figma_net}</span>
+                    <span className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-surface text-secondary text-[10px] px-2 py-1 shadow-md border border-outline-variant/30 rounded font-bold whitespace-nowrap transition-all duration-300 pointer-events-none z-50 ${figmaCopiedNet ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
+                      {t.copied}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="h-px bg-outline-variant/30 w-1/2 mx-auto my-[32px] md:my-[40px]"></div>
+
+              {/* GROSS */}
+              <div className="flex flex-col items-center w-full">
+                <div className="flex flex-col items-center w-full">
+                  <h3 className="text-[10px] md:text-caption font-medium uppercase tracking-widest text-on-surface-variant mb-2">{t.format_bleedbox}</h3>
+                  <div className="flex flex-col items-stretch w-full md:w-max">
+                    <div className="flex items-center justify-center flex-wrap gap-2 md:gap-3">
+                  
+                  {/* Gross Width */}
+                  <button
+                    onClick={() => copySingle(grossW, 'grossW')}
+                    className="relative group px-3 py-1 bg-surface-variant/20 hover:bg-surface-variant/40 rounded-lg transition-colors cursor-pointer"
+                    title={t.copy_w}
+                  >
+                    <span className="text-[28px] md:text-display-lg font-bold text-primary group-hover:text-secondary font-data-lg tracking-tighter md:leading-none tabular-nums transition-colors">
+                      {formatOutput(grossW)}
+                    </span>
+                    <span className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-surface text-secondary text-[10px] px-2 py-1 shadow-md border border-outline-variant/30 rounded font-bold whitespace-nowrap transition-all duration-300 pointer-events-none z-50 ${copiedState === 'grossW' ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
+                      {t.copied}
+                    </span>
+                  </button>
+
+                  <span className="text-[28px] md:text-display-lg font-bold text-outline-variant/50 font-data-lg tracking-tighter md:leading-none tabular-nums">
+                    ×
+                  </span>
+
+                  {/* Gross Height */}
+                  <button
+                    onClick={() => copySingle(grossH, 'grossH')}
+                    className="relative group px-3 py-1 bg-surface-variant/20 hover:bg-surface-variant/40 rounded-lg transition-colors cursor-pointer"
+                    title={t.copy_h}
+                  >
+                    <span className="text-[28px] md:text-display-lg font-bold text-primary group-hover:text-secondary font-data-lg tracking-tighter md:leading-none tabular-nums transition-colors">
+                      {formatOutput(grossH)}
+                    </span>
+                    <span className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-surface text-secondary text-[10px] px-2 py-1 shadow-md border border-outline-variant/30 rounded font-bold whitespace-nowrap transition-all duration-300 pointer-events-none z-50 ${copiedState === 'grossH' ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
+                      {t.copied}
+                    </span>
+                  </button>
+
+                  <span className="text-[14px] md:text-label-mono font-medium text-outline font-bold ml-1">{t.px}</span>
+                    </div>
+
+                    {/* Figma Button */}
+                    <div className="w-full flex justify-center md:flex-col md:items-stretch mb-0 md:mb-xl mt-[24px] relative">
+                      <button
+                        onClick={() => handleCopyFigma(false)}
+                        className="relative group flex items-center justify-center gap-2 bg-[#1A1A1A] hover:bg-black text-white font-medium px-3 py-2 md:py-3 rounded-lg transition-colors w-full"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">content_copy</span>
+                        <span>{t.copy_figma}</span>
+                      </button>
+
+                      <div className={`absolute top-[calc(100%+8px)] left-1/2 -translate-x-1/2 bg-surface text-secondary border border-outline-variant/30 px-3 py-2 md:px-4 md:py-3 shadow-xl rounded-lg text-center w-full z-50 transition-all duration-300 pointer-events-none ${figmaCopied ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
+                        <div className="font-bold text-[10px] mb-1.5 uppercase tracking-wide">
+                          {t.copied}
+                        </div>
+                        <div className="text-[13px] md:text-[14px] font-medium text-on-surface opacity-90 leading-snug">
+                          {t.figma_hint1} <br/>
+                          {t.figma_hint2}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

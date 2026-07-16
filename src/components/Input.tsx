@@ -12,7 +12,7 @@ interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChan
 export const Input: FC<InputProps> = ({ label, unit, value, onChange, onBlur, error, ...props }) => {
   return (
     <div className="flex flex-col relative group md:pt-2">
-      <label className="absolute -top-[9px] md:top-0 left-sm bg-background px-xs text-[10px] font-semibold md:font-bold text-outline z-10 uppercase tracking-widest">
+      <label className="absolute -top-[7px] md:-top-[4px] left-sm bg-background px-xs text-[10px] font-semibold md:font-bold text-outline z-10 uppercase tracking-widest">
         {label}
       </label>
       <div className="relative flex items-center">
