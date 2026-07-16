@@ -295,28 +295,21 @@ export default function App() {
   const marginX = (mNum / safeW) * 100;
 
   return (
-    <div className="min-h-screen text-on-surface flex flex-col font-body-md md:text-body-md antialiased border-x border-outline-variant/30 max-w-[390px] md:max-w-[1440px] mx-auto bg-background overflow-x-hidden md:overflow-x-visible">
+    <div className="min-h-screen text-on-surface flex flex-col font-body-md md:text-body-md antialiased border-x border-outline-variant/30 max-w-[390px] md:max-w-[1440px] mx-auto bg-background">
       {/* TopNavBar */}
-      <header className="bg-surface top-0 md:border-b border-outline-variant md:border-outline-variant/50 sticky z-50 w-full flex justify-between items-center px-md py-md md:px-margin md:py-md">
-        {/* Mobile Logo */}
-        <div className="md:hidden text-[32px] font-bold text-primary flex items-center gap-xs tracking-tight">
-          <span>ММ</span>
-          <span className="material-symbols-outlined text-[20px] font-[200]">arrow_forward</span>
-          <span>PX</span>
+      <header className="bg-surface top-0 border-b border-outline-variant/30 md:border-outline-variant/50 sticky z-50 flex justify-between items-center w-full px-md py-md md:px-margin md:py-md max-w-[1440px] mx-auto">
+        {/* Universal Logo */}
+        <div className="flex flex-col gap-1">
+          <h1 className="text-display-sm font-bold text-primary leading-none tracking-tight">ММ → PX</h1>
+          <p className="text-[10px] text-on-surface-variant uppercase tracking-widest font-medium">КАЛЬКУЛЯТОР ФОРМАТОВ</p>
         </div>
-        {/* Desktop Logo */}
-        <div className="hidden md:flex items-center gap-md">
-          <span className="text-headline-md font-bold text-primary tracking-tighter uppercase">ММ → PX</span>
-          <span className="text-outline-variant">|</span>
-          <span className="text-on-surface-variant font-medium">Калькулятор размера макета</span>
+
+        {/* Language Switch */}
+        <div className="flex items-center gap-xs md:gap-sm text-[12px] md:text-[14px] font-medium">
+          <button className="text-primary font-bold hover:opacity-80 transition-opacity">RU</button>
+          <span className="text-outline-variant/50">/</span>
+          <button className="text-on-surface-variant hover:text-primary transition-colors">ENG</button>
         </div>
-        
-        {/* Navigation */}
-        <nav className="flex gap-lg items-baseline text-body-md">
-          <a className="hidden md:inline text-primary font-bold border-b-2 border-primary pb-0.5" href="#">Инфо</a>
-          
-          <a className="md:hidden text-on-surface-variant text-[14px] font-medium hover:text-secondary transition-colors" href="#">Инфо</a>
-        </nav>
       </header>
 
       {/* Main Content */}
@@ -356,23 +349,23 @@ export default function App() {
               </div>
 
               {/* Orientation */}
-              <div className="flex bg-surface-container-low p-[2px] md:p-xs rounded md:rounded-none border border-outline-variant/50 md:border-outline-variant/30 w-full mt-xs md:mt-0">
+              <div className="flex bg-surface-container-low p-[2px] md:p-xs rounded border border-outline-variant/50 md:border-outline-variant/30 w-full mt-xs md:mt-0">
                 <button
                   onClick={() => handleOrientationToggle('portrait')}
-                  className={`flex-1 px-md py-sm text-[14px] md:text-label-mono transition-all md:rounded
+                  className={`flex-1 px-md py-sm text-[14px] md:text-label-mono transition-all rounded-[2px]
                     ${orientation === 'portrait' 
-                      ? 'bg-surface shadow-sm text-secondary font-bold rounded' 
-                      : 'text-on-surface-variant font-medium hover:text-primary rounded'
+                      ? 'bg-surface shadow-sm text-secondary font-bold' 
+                      : 'text-on-surface-variant font-medium hover:text-primary'
                     }`}
                 >
                   Книжная
                 </button>
                 <button
                   onClick={() => handleOrientationToggle('landscape')}
-                  className={`flex-1 px-md py-sm text-[14px] md:text-label-mono transition-all md:rounded
+                  className={`flex-1 px-md py-sm text-[14px] md:text-label-mono transition-all rounded-[2px]
                     ${orientation === 'landscape' 
-                      ? 'bg-surface shadow-sm text-secondary font-bold rounded' 
-                      : 'text-on-surface-variant font-medium hover:text-primary rounded'
+                      ? 'bg-surface shadow-sm text-secondary font-bold' 
+                      : 'text-on-surface-variant font-medium hover:text-primary'
                     }`}
                 >
                   Альбомная
@@ -425,7 +418,7 @@ export default function App() {
               <div className="h-px bg-outline-variant/50 flex-1"></div>
             </div>
 
-            <div className="flex flex-col gap-md md:gap-lg mt-xs md:mt-0">
+            <div className="flex flex-col gap-md mt-xs md:mt-0">
               <div className="grid grid-cols-5 md:flex md:flex-wrap gap-sm">
                 {['72', '96', '150', '300', '600'].map((val) => {
                   const isSelected = dpi === val;
@@ -444,7 +437,7 @@ export default function App() {
                   );
                 })}
               </div>
-              <div className="mt-sm md:mt-2">
+              <div className="mt-0">
                 <Input label="DPI" unit="dpi" value={dpi} onChange={setDpi} />
               </div>
             </div>
@@ -452,7 +445,7 @@ export default function App() {
         </div>
 
         {/* Right Column (Preview) */}
-        <div className="col-span-1 lg:col-span-5 flex flex-col z-10 md:mt-0 mt-4 lg:h-0 lg:min-h-full min-h-0">
+        <div className="col-span-1 lg:col-span-5 flex flex-col z-10 mt-0 lg:h-0 lg:min-h-full min-h-0">
           <section className="flex-1 w-full flex flex-col items-center py-md md:py-xl bg-surface-container-low border border-outline-variant/30 rounded min-h-0">
             
             <div className="flex-1 flex items-center justify-center min-h-0 w-full py-md">
@@ -499,9 +492,9 @@ export default function App() {
         </div>
 
         {/* Step 4: Results Block */}
-        <section className="lg:col-span-12 flex flex-col gap-md md:gap-xl md:px-xl md:pt-xl md:pb-0 md:bg-surface-container-lowest border-none md:border border-outline-variant/20 md:items-center md:text-center rounded mt-0 w-full justify-center">
-          <div className="bg-surface md:bg-transparent border border-outline-variant md:border-none pt-md pb-md md:p-0 relative text-center w-full rounded">
-            <div className="flex flex-col gap-md md:gap-xl w-full py-md md:py-0 items-center">
+        <section className="lg:col-span-12 flex flex-col gap-md md:gap-xl p-md md:px-xl md:pt-xl md:pb-0 bg-surface-container-lowest border border-outline-variant/30 md:border-outline-variant/20 items-center md:text-center rounded mt-0 w-full justify-center">
+          <div className="relative text-center w-full">
+            <div className="flex flex-col gap-md md:gap-xl w-full items-center">
               {/* GROSS */}
               <div className="flex flex-col gap-xs md:gap-sm items-center w-full">
                 <h3 className="text-[10px] md:text-caption font-medium uppercase tracking-widest text-on-surface-variant">ФОРМАТ С УЧЕТОМ ВЫЛЕТОВ (BLEEDBOX)</h3>
@@ -587,16 +580,16 @@ export default function App() {
               </div>
               
               {/* Figma Button */}
-              <div className="w-full flex justify-center mb-0 md:mb-xl mt-2 relative">
+              <div className="w-full md:w-[340px] flex justify-center md:flex-col md:items-center mb-0 md:mb-xl mt-2 relative">
                 <button
                   onClick={handleCopyFigma}
-                  className="relative group flex items-center justify-center gap-2 bg-[#1A1A1A] hover:bg-black text-white font-medium px-5 py-2 md:py-3 rounded-lg transition-colors w-auto"
+                  className="relative group flex items-center justify-center gap-2 bg-[#1A1A1A] hover:bg-black text-white font-medium px-3 py-2 md:py-3 rounded-lg transition-colors w-full"
                 >
                   <span className="material-symbols-outlined text-[18px]">content_copy</span>
                   <span>Скопировать фрейм для Figma</span>
                 </button>
 
-                <div className={`absolute top-[calc(100%+8px)] left-1/2 -translate-x-1/2 bg-surface text-secondary border border-outline-variant/30 px-3 py-2 md:px-4 md:py-3 shadow-xl rounded-lg text-center w-[90vw] max-w-[320px] md:w-max z-50 transition-all duration-300 pointer-events-none ${figmaCopied ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
+                <div className={`absolute top-[calc(100%+8px)] left-1/2 -translate-x-1/2 bg-surface text-secondary border border-outline-variant/30 px-3 py-2 md:px-4 md:py-3 shadow-xl rounded-lg text-center w-full z-50 transition-all duration-300 pointer-events-none ${figmaCopied ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}>
                   <div className="font-bold text-[10px] mb-1.5 uppercase tracking-wide">
                     ✓ СКОПИРОВАНО
                   </div>
@@ -613,15 +606,14 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-surface border-t border-outline-variant md:border-outline-variant/50 flex flex-col md:flex-row md:justify-between items-center w-full px-md md:px-margin py-lg mt-xl md:mt-auto relative z-20">
-        <div className="flex justify-between items-center md:hidden w-full">
-          <span className="text-[12px] text-on-surface-variant/80">© {new Date().getFullYear()} ММ → PX.</span>
-          <a className="text-[12px] font-medium text-on-surface-variant hover:text-secondary transition-colors" href="https://github.com/tenebrius-dev/MM-to-PX-Calculator" target="_blank" rel="noreferrer">GitHub</a>
+      <footer className="bg-surface border-t border-outline-variant md:border-outline-variant/50 flex justify-between items-center w-full px-md md:px-margin py-lg mt-xl md:mt-auto relative z-20">
+        <div className="flex items-center gap-sm md:gap-md">
+          <span className="text-[12px] md:text-body-md text-on-surface-variant font-normal">© {new Date().getFullYear()} ММ → PX.</span>
+          <a className="text-[12px] md:text-body-md text-on-surface-variant hover:text-secondary transition-colors font-normal" href="https://github.com/tenebrius-dev/MM-to-PX-Calculator" target="_blank" rel="noreferrer">GitHub</a>
         </div>
-
-        <span className="hidden md:inline text-body-md font-bold text-primary">© {new Date().getFullYear()} ММ → PX.</span>
-        <div className="hidden md:flex gap-md text-body-md text-on-surface-variant">
-          <a className="hover:text-primary transition-colors" href="https://github.com/tenebrius-dev/MM-to-PX-Calculator" target="_blank" rel="noreferrer">GitHub</a>
+        
+        <div>
+          <button className="text-[12px] md:text-body-md text-on-surface-variant hover:text-secondary transition-colors font-normal">Инфо</button>
         </div>
       </footer>
     </div>
